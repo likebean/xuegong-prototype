@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习资源</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: var(--bg-color);
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .learn-tabs {
+            display: flex;
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .learn-tab {
+            flex: 1;
+            text-align: center;
+            padding: var(--spacing-md) 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .learn-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .learn-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 1px;
+        }
+
+        .search-bar {
+            background: var(--bg-card);
+            padding: 0 var(--spacing-md) var(--spacing-md);
+            position: sticky;
+            top: 44px;
+            z-index: 10;
+        }
+
+        .search-inner {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 40px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        .learn-container {
+            padding: var(--spacing-md);
+        }
+
+        .article-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .article-cover {
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .article-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .article-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+        }
+
+        .article-content {
+            padding: var(--spacing-md);
+        }
+
+        .article-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.4;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .article-author {
+            margin-right: 12px;
+        }
+
+        .article-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+
+        .course-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            overflow: hidden;
+        }
+
+        .course-cover {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .course-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .course-content {
+            flex: 1;
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .course-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex: 1;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+
+        .course-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: var(--spacing-sm);
+        }
+
+        .course-lessons {
+            display: flex;
+            align-items: center;
+        }
+
+        .course-lessons i {
+            margin-right: 4px;
+            font-size: 14px;
+        }
+
+        .resource-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+        }
+
+        .resource-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+        }
+
+        .resource-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .resource-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .resource-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .resource-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .resource-btn:active {
+            opacity: 0.8;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+            color: var(--text-tertiary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部选项卡 -->
+    <div class="learn-tabs">
+        <div class="learn-tab active" data-tab="case">谈话案例</div>
+        <div class="learn-tab" data-tab="psychology">心理知识</div>
+        <div class="learn-tab" data-tab="guide">工作指南</div>
+    </div>
+
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+        <div class="search-inner">
+            <div class="search-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            <input type="search" class="search-input" placeholder="搜索学习资源" id="searchInput">
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="learn-container">
+        <!-- 谈话案例内容 -->
+        <div class="tab-content active" id="case-content">
+            <div class="article-card" onclick="openArticle('case-1')">
+                <div class="article-cover">
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=conversation1&backgroundColor=b6e3f4" alt="案例封面">
+                    <span class="article-tag">学业困难</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-title">如何与学业困难学生有效谈心？三段式谈话法案例分析</div>
+                    <div class="article-meta">
+                        <span class="article-author">李明教授</span>
+                        <span>阅读量 2.8万</span>
+                    </div>
+                    <div class="article-desc">
+                        本文通过一个真实案例，详细讲解针对学业困难学生的三段式谈话方法：问题识别、原因分析和解决方案。学生小王连续两门课程不及格，通过系统性谈话，发现学生学习方法不当和注意力难以集中是主要原因...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="article-card" onclick="openArticle('case-2')">
+                <div class="article-cover">
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=conversation2&backgroundColor=c0aede" alt="案例封面">
+                    <span class="article-tag">心理问题</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-title">抑郁倾向学生谈心实录：从疏远到信任的沟通技巧</div>
+                    <div class="article-meta">
+                        <span class="article-author">张华心理咨询师</span>
+                        <span>阅读量 1.5万</span>
+                    </div>
+                    <div class="article-desc">
+                        本案例记录了辅导员与一位有抑郁倾向学生的三次谈话过程，详细展示了如何建立信任关系，运用倾听、共情和适当引导的技巧，帮助学生逐步开放心扉并接受专业帮助...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="article-card" onclick="openArticle('case-3')">
+                <div class="article-cover">
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=conversation3&backgroundColor=ffd5dc" alt="案例封面">
+                    <span class="article-tag">就业指导</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-title">就业迷茫学生的职业规划谈话：从兴趣探索到行动计划</div>
+                    <div class="article-meta">
+                        <span class="article-author">赵婷职业规划师</span>
+                        <span>阅读量 9千</span>
+                    </div>
+                    <div class="article-desc">
+                        针对大四即将毕业但对未来方向迷茫的学生，本案例展示了一次完整的职业规划谈话，包括兴趣测评、能力分析、职业匹配以及具体行动计划的制定。该方法已帮助超过50名学生明确就业方向...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="article-card" onclick="openArticle('case-4')">
+                <div class="article-cover">
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=conversation4&backgroundColor=c1e1c5" alt="案例封面">
+                    <span class="article-tag">人际关系</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-title">宿舍人际冲突调解：四方会谈的组织与引导技巧</div>
+                    <div class="article-meta">
+                        <span class="article-author">王强辅导员</span>
+                        <span>阅读量 1.2万</span>
+                    </div>
+                    <div class="article-desc">
+                        本案例详细记录了一次成功的宿舍冲突调解过程，包括前期单独谈话、情况评估、四方会谈的组织以及后续跟踪。通过"事实-感受-需求-请求"的沟通框架，帮助四位室友重建和谐关系...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 心理知识内容 -->
+        <div class="tab-content" id="psychology-content">
+            <div class="course-card" onclick="openCourse('psy-1')">
+                <div class="course-cover">
+                    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=psychology1&backgroundColor=b6e3f4" alt="课程封面">
+                </div>
+                <div class="course-content">
+                    <div class="course-title">大学生常见心理问题识别与初步干预</div>
+                    <div class="course-desc">本课程介绍大学生常见的抑郁、焦虑、强迫、人际交往障碍等心理问题的识别方法、表现特征以及辅导员可采取的初步干预措施。</div>
+                    <div class="course-meta">
+                        <div class="course-lessons">
+                            <i class="fas fa-book"></i> 8课时
+                        </div>
+                        <div>5600人学习</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="course-card" onclick="openCourse('psy-2')">
+                <div class="course-cover">
+                    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=psychology2&backgroundColor=ffdfbf" alt="课程封面">
+                </div>
+                <div class="course-content">
+                    <div class="course-title">积极心理学：培养学生心理韧性的方法</div>
+                    <div class="course-desc">基于积极心理学理论，提供一系列提升学生心理韧性、幸福感和成长思维的实用工具和活动方案，助力学生全面发展。</div>
+                    <div class="course-meta">
+                        <div class="course-lessons">
+                            <i class="fas fa-book"></i> 6课时
+                        </div>
+                        <div>3800人学习</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="course-card" onclick="openCourse('psy-3')">
+                <div class="course-cover">
+                    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=psychology3&backgroundColor=d1d4f9" alt="课程封面">
+                </div>
+                <div class="course-content">
+                    <div class="course-title">情绪管理：理解与引导学生情绪的技巧</div>
+                    <div class="course-desc">本课程讲解情绪的生物学基础、常见情绪问题的表现与应对，以及如何帮助学生识别、接纳和管理自身情绪的方法。</div>
+                    <div class="course-meta">
+                        <div class="course-lessons">
+                            <i class="fas fa-book"></i> 5课时
+                        </div>
+                        <div>4200人学习</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-title">
+                    <i class="fas fa-file-pdf"></i>
+                    大学生心理健康评估量表合集
+                </div>
+                <div class="resource-desc">
+                    包含SDS抑郁自评量表、SAS焦虑自评量表、SCL-90症状自评量表等10种常用心理测评工具，辅导员可用于初步筛查学生心理状况。
+                </div>
+                <div class="resource-action">
+                    <div class="resource-btn" onclick="downloadResource('psy-resource-1')">
+                        下载资源
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-title">
+                    <i class="fas fa-file-powerpoint"></i>
+                    心理危机干预流程与案例PPT
+                </div>
+                <div class="resource-desc">
+                    详细介绍高校心理危机识别、报告、干预和转介的完整流程，附带5个典型案例分析及处理方法。
+                </div>
+                <div class="resource-action">
+                    <div class="resource-btn" onclick="downloadResource('psy-resource-2')">
+                        下载资源
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 工作指南内容 -->
+        <div class="tab-content" id="guide-content">
+            <div class="article-card" onclick="openArticle('guide-1')">
+                <div class="article-cover">
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=guide1&backgroundColor=b6e3f4" alt="指南封面">
+                </div>
+                <div class="article-content">
+                    <div class="article-title">辅导员谈心谈话工作规范与流程指南</div>
+                    <div class="article-meta">
+                        <span class="article-author">教育部学生工作司</span>
+                        <span>阅读量 5.6万</span>
+                    </div>
+                    <div class="article-desc">
+                        本指南系统介绍辅导员谈心谈话工作的目标定位、实施原则、操作流程、记录规范以及评估方法，为开展规范化谈心谈话工作提供指导。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="article-card" onclick="openArticle('guide-2')">
+                <div class="article-cover">
+                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed=guide2&backgroundColor=ffdfbf" alt="指南封面">
+                </div>
+                <div class="article-content">
+                    <div class="article-title">学生思想政治工作方法与技巧手册</div>
+                    <div class="article-meta">
+                        <span class="article-author">全国高校辅导员工作研究会</span>
+                        <span>阅读量 3.2万</span>
+                    </div>
+                    <div class="article-desc">
+                        针对新时代大学生特点，介绍思想政治教育的创新方法、典型案例和实践活动，帮助辅导员提升育人能力和工作实效。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-title">
+                    <i class="fas fa-file-word"></i>
+                    谈心谈话记录表格模板
+                </div>
+                <div class="resource-desc">
+                    包含个人谈话记录表、集体谈话记录表、专题谈话记录表等多种标准化模板，便于辅导员规范记录与归档谈话内容。
+                </div>
+                <div class="resource-action">
+                    <div class="resource-btn" onclick="downloadResource('guide-resource-1')">
+                        下载资源
+                    </div>
+                </div>
+            </div>
+            
+            <div class="course-card" onclick="openCourse('guide-course-1')">
+                <div class="course-cover">
+                    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=guide3&backgroundColor=c1e1c5" alt="课程封面">
+                </div>
+                <div class="course-content">
+                    <div class="course-title">新入职辅导员工作指南</div>
+                    <div class="course-desc">专为新入职辅导员设计的系统培训课程，内容涵盖角色定位、工作职责、常见问题处理、班级管理、学生工作系统使用等方面。</div>
+                    <div class="course-meta">
+                        <div class="course-lessons">
+                            <i class="fas fa-book"></i> 10课时
+                        </div>
+                        <div>7500人学习</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="course-card" onclick="openCourse('guide-course-2')">
+                <div class="course-cover">
+                    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=guide4&backgroundColor=ffd5dc" alt="课程封面">
+                </div>
+                <div class="course-content">
+                    <div class="course-title">学生突发事件应对与处理</div>
+                    <div class="course-desc">详细讲解学生安全事故、心理危机、网络舆情等突发事件的预防、识别和处理流程，提供决策树和案例分析。</div>
+                    <div class="course-meta">
+                        <div class="course-lessons">
+                            <i class="fas fa-book"></i> 7课时
+                        </div>
+                        <div>5100人学习</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化选项卡功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.learn-tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有选项卡的活跃状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // 添加当前选项卡的活跃状态
+                    this.classList.add('active');
+                    
+                    // 获取目标内容ID
+                    const targetId = this.getAttribute('data-tab') + '-content';
+                    
+                    // 隐藏所有内容
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // 显示目标内容
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // 初始化搜索功能
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const searchText = this.value.toLowerCase().trim();
+                
+                if (!searchText) {
+                    // 如果搜索框为空，显示所有内容
+                    resetSearchResults();
+                    return;
+                }
+                
+                // 搜索所有内容
+                searchContent(searchText);
+            });
+        });
+        
+        // 重置搜索结果
+        function resetSearchResults() {
+            // 恢复原有内容显示状态
+            const activeTab = document.querySelector('.learn-tab.active');
+            if (activeTab) {
+                const targetId = activeTab.getAttribute('data-tab') + '-content';
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                document.getElementById(targetId).classList.add('active');
+            }
+            
+            // 移除搜索结果的隐藏状态
+            document.querySelectorAll('.article-card, .course-card, .resource-card').forEach(card => {
+                card.style.display = '';
+            });
+            
+            // 移除空状态提示
+            const emptyStates = document.querySelectorAll('.empty-state');
+            emptyStates.forEach(el => el.remove());
+        }
+        
+        // 搜索内容
+        function searchContent(searchText) {
+            // 显示所有内容面板以便搜索
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('active');
+            });
+            
+            // 遍历所有卡片，隐藏不匹配的
+            let matchFound = false;
+            
+            document.querySelectorAll('.article-card, .course-card, .resource-card').forEach(card => {
+                const title = card.querySelector('.article-title, .course-title, .resource-title').textContent.toLowerCase();
+                const desc = card.querySelector('.article-desc, .course-desc, .resource-desc').textContent.toLowerCase();
+                
+                if (title.includes(searchText) || desc.includes(searchText)) {
+                    card.style.display = '';
+                    matchFound = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // 如果没有找到匹配项，显示空状态
+            if (!matchFound) {
+                // 移除已有的空状态
+                document.querySelectorAll('.empty-state').forEach(el => el.remove());
+                
+                // 创建空状态元素
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = `
+                    <div class="empty-icon">🔍</div>
+                    <div class="empty-text">未找到匹配的学习资源</div>
+                `;
+                
+                document.querySelector('.learn-container').appendChild(emptyState);
+            } else {
+                // 移除已有的空状态
+                document.querySelectorAll('.empty-state').forEach(el => el.remove());
+            }
+        }
+        
+        // 打开文章详情
+        function openArticle(articleId) {
+            // 这里实际应该跳转到文章详情页，这里只弹出一个提示
+            alert('打开文章：' + articleId);
+        }
+        
+        // 打开课程详情
+        function openCourse(courseId) {
+            // 这里实际应该跳转到课程详情页，这里只弹出一个提示
+            alert('打开课程：' + courseId);
+        }
+        
+        // 下载资源
+        function downloadResource(resourceId) {
+            // 这里实际应该下载资源文件，这里只弹出一个提示
+            alert('下载资源：' + resourceId);
+        }
+    </script>
+</body>
+</html> 
