@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            padding: var(--spacing-md);
+            height: 100vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: var(--bg-color);
+        }
+
+        .section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-grid {
+            display: grid;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stats-grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .stats-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stats-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .stats-card {
+            background: var(--bg-light);
+            padding: var(--spacing-md);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-card:active {
+            transform: scale(0.98);
+            background: var(--bg-hover);
+        }
+
+        .stats-title {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stats-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .stats-value.warning {
+            color: var(--warning);
+        }
+
+        .stats-value.info {
+            color: var(--info-color);
+        }
+
+        .stats-trend {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        .stats-trend.up {
+            color: var(--primary-color);
+        }
+
+        .stats-trend.down {
+            color: var(--warning);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-color);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: var(--spacing-sm);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .recent-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            margin-right: var(--spacing-md);
+            overflow: hidden;
+        }
+
+        .recent-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recent-content {
+            flex: 1;
+        }
+
+        .recent-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .recent-meta {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .pull-refresh {
+            height: 50px;
+            margin-top: -50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .pull-refresh.loading .pull-refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .quick-actions {
+            display: none;
+        }
+
+        .talk-button {
+            display: none;
+        }
+
+        .section-header,
+        .action-button,
+        .action-button:active,
+        .action-button svg {
+            display: none;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+
+        .data-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .data-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .data-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .data-value.warning {
+            color: var(--warning);
+        }
+
+        .data-value.info {
+            color: var(--info-color);
+        }
+
+        .data-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .data-desc.up {
+            color: var(--primary-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(7, 193, 96, 0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .stats-dashboard {
+            margin-top: var(--spacing-lg);
+        }
+
+        .warning-list {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            background: rgba(var(--warning-rgb), 0.1);
+            color: var(--warning);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* 添加问候区域样式 */
+        .greeting-card {
+            background: linear-gradient(135deg, #07C160 0%, #0AB356 100%);
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            color: white;
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.2);
+        }
+        
+        .greeting-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .teacher-name {
+            font-weight: bold;
+        }
+        
+        .greeting-date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        :root {
+            --warning-rgb: 255, 152, 0;
+            --warning: rgb(var(--warning-rgb));
+            --info-color: #2196F3;
+            --bg-light: #ffffff;
+            --bg-hover: #f8f9fa;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --text-primary: #2c3e50;
+            --text-secondary: #606f7b;
+            --text-tertiary: #8795a1;
+            --primary-color: #07C160;
+            --bg-color: #f5f7fa;
+            --bg-card: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 下拉刷新 -->
+    <div class="pull-refresh">
+        <span class="pull-refresh-icon">↓</span>
+        <span class="pull-refresh-text">下拉刷新</span>
+    </div>
+
+    <!-- 问候区域 -->
+    <div class="greeting-card">
+        <div class="greeting-text">
+            <span class="teacher-name">王老师</span>，您好！
+        </div>
+        <div class="greeting-date">今天是 <span id="currentDate"></span></div>
+    </div>
+
+    <!-- 数据概览 -->
+    <div class="section">
+        <h2 class="section-title">数据概览</h2>
+        <div class="grid grid-2">
+            <div class="stats-card">
+                <div class="stats-title">本周谈话</div>
+                <div class="stats-value">12</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-title">待处理预警</div>
+                <div class="stats-value warning">3</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-title">问题解决率</div>
+                <div class="stats-value">89%</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-title">工作完成率</div>
+                <div class="stats-value">95%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工作统计 -->
+    <div class="card">
+        <div class="card-title">工作统计</div>
+        <div class="data-grid">
+            <div class="data-item">
+                <div class="data-label">本周谈话</div>
+                <div class="data-value">12</div>
+                <div class="data-desc up">较上周增长20%</div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">问题解决率</div>
+                <div class="data-value">89%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 89%"></div>
+                </div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">工作完成率</div>
+                <div class="data-value">95%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 95%"></div>
+                </div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">学生反馈评分</div>
+                <div class="data-value info">4.8</div>
+                <div class="data-desc">共收到48条反馈</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预警情况 -->
+    <div class="card">
+        <div class="card-title">预警情况</div>
+        <div class="data-grid">
+            <div class="data-item">
+                <div class="data-label">新增预警</div>
+                <div class="data-value warning">5</div>
+                <div class="data-desc">本周新增</div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">待处理预警</div>
+                <div class="data-value warning">3</div>
+                <div class="data-desc">需要跟进</div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">预警处理率</div>
+                <div class="data-value">92%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 92%"></div>
+                </div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">平均处理时间</div>
+                <div class="data-value">2.5</div>
+                <div class="data-desc">工作日</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 问题分布 -->
+    <div class="card">
+        <div class="card-title">问题分布</div>
+        <div class="data-grid">
+            <div class="data-item">
+                <div class="data-label">学业问题</div>
+                <div class="data-value">42%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 42%"></div>
+                </div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">心理问题</div>
+                <div class="data-value warning">28%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 28%; background: var(--warning)"></div>
+                </div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">就业问题</div>
+                <div class="data-value">18%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 18%"></div>
+                </div>
+            </div>
+            <div class="data-item">
+                <div class="data-label">其他问题</div>
+                <div class="data-value">12%</div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: 12%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 设置当前日期
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('zh-CN', options);
+        });
+
+        // 下拉刷新
+        let startY = 0;
+        let pulling = false;
+        
+        document.addEventListener('touchstart', (e) => {
+            if (document.documentElement.scrollTop === 0) {
+                startY = e.touches[0].pageY;
+                pulling = true;
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!pulling) return;
+            
+            const pullDistance = e.touches[0].pageY - startY;
+            if (pullDistance > 0 && pullDistance < 100) {
+                const pullRefresh = document.querySelector('.pull-refresh');
+                pullRefresh.style.transform = `translateY(${pullDistance}px)`;
+                
+                if (pullDistance > 50) {
+                    pullRefresh.querySelector('.pull-refresh-text').textContent = '释放刷新';
+                    pullRefresh.querySelector('.pull-refresh-icon').style.transform = 'rotate(180deg)';
+                } else {
+                    pullRefresh.querySelector('.pull-refresh-text').textContent = '下拉刷新';
+                    pullRefresh.querySelector('.pull-refresh-icon').style.transform = 'none';
+                }
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            if (!pulling) return;
+            
+            const pullRefresh = document.querySelector('.pull-refresh');
+            const pullDistance = parseInt(pullRefresh.style.transform.replace('translateY(', ''));
+            
+            if (pullDistance > 50) {
+                // 触发刷新
+                pullRefresh.classList.add('loading');
+                pullRefresh.querySelector('.pull-refresh-text').textContent = '正在刷新...';
+                refreshData();
+            }
+            
+            // 重置状态
+            pullRefresh.style.transform = 'none';
+            pulling = false;
+        });
+
+        // 刷新数据
+        function refreshData() {
+            // 模拟数据刷新
+            setTimeout(() => {
+                const pullRefresh = document.querySelector('.pull-refresh');
+                pullRefresh.classList.remove('loading');
+                pullRefresh.querySelector('.pull-refresh-text').textContent = '刷新成功';
+                pullRefresh.querySelector('.pull-refresh-icon').style.transform = 'none';
+                
+                // 3秒后重置文本
+                setTimeout(() => {
+                    pullRefresh.querySelector('.pull-refresh-text').textContent = '下拉刷新';
+                }, 3000);
+            }, 2000);
+        }
+
+        function handleQuickAdd() {
+            // TODO: 实现快速添加功能
+            window.parent.postMessage({ type: 'quickAdd' }, '*');
+        }
+
+        // 格式化时间
+        function formatTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) { // 1分钟内
+                return '刚刚';
+            } else if (diff < 3600000) { // 1小时内
+                return Math.floor(diff / 60000) + '分钟前';
+            } else if (diff < 86400000) { // 1天内
+                return Math.floor(diff / 3600000) + '小时前';
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+    </script>
+</body>
+</html> 

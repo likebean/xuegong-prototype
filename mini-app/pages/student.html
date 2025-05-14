@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <style>
+        body {
+            padding: var(--spacing-md);
+            height: 100vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            padding: 0 40px;
+            border: none;
+            border-radius: 20px;
+            background: var(--bg-color);
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+        }
+
+        .filter-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            cursor: pointer;
+        }
+
+        /* 新增: 选项卡导航 */
+        .tabs-nav {
+            display: flex;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-size: 14px;
+            color: var(--text-secondary);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 1px;
+        }
+
+        .student-list {
+            margin: 0 calc(-1 * var(--spacing-md));
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-lg);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            position: relative; /* 新增：相对定位，用于放置收藏图标 */
+        }
+
+        .student-item:active {
+            background: var(--bg-color);
+        }
+
+        .student-avatar {
+            margin-right: var(--spacing-lg);
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .student-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        .meta-divider {
+            margin: 0 var(--spacing-sm);
+            color: var(--text-tertiary);
+        }
+
+        .student-tags {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .tag-warning {
+            background: var(--warning);
+            color: var(--text-white);
+        }
+
+        .tag-info {
+            background: var(--info);
+            color: var(--text-white);
+        }
+
+        /* 新增: 收藏图标样式 */
+        .favorite-btn {
+            position: absolute;
+            right: var(--spacing-lg);
+            top: var(--spacing-lg);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .favorite-btn:active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .favorite-btn.active {
+            color: #FFA300;
+        }
+
+        .filter-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-mask);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .filter-panel.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .filter-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 20px 20px 0 0;
+            padding: var(--spacing-lg);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .filter-panel.active .filter-content {
+            transform: translateY(0);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .filter-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .filter-close {
+            padding: var(--spacing-sm);
+            margin: calc(-1 * var(--spacing-sm));
+            cursor: pointer;
+        }
+
+        .filter-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .filter-group-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .filter-option {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            background: var(--bg-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .filter-option.active {
+            background: var(--primary-color);
+            color: var(--text-white);
+        }
+
+        /* 新增：空状态提示 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl) 0;
+            color: var(--text-tertiary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="search" class="search-input" placeholder="搜索学生姓名、学号" id="searchInput">
+        <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="toggleFilter()">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+    </div>
+
+    <!-- 新增: 选项卡导航 -->
+    <div class="tabs-nav">
+        <div class="tab active" data-tab="all">全部学生</div>
+        <div class="tab" data-tab="favorites">重点关注</div>
+    </div>
+
+    <!-- 学生列表 -->
+    <div class="student-list" id="studentList">
+        <!-- 列表项将通过 JavaScript 动态生成 -->
+    </div>
+
+    <!-- 筛选面板 -->
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-content">
+            <div class="filter-header">
+                <div class="filter-title">筛选</div>
+                <div class="filter-close" onclick="toggleFilter()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-group-title">年级</div>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="grade" data-value="all">全部</div>
+                    <div class="filter-option" data-filter="grade" data-value="2023级">2023级</div>
+                    <div class="filter-option" data-filter="grade" data-value="2022级">2022级</div>
+                    <div class="filter-option" data-filter="grade" data-value="2021级">2021级</div>
+                    <div class="filter-option" data-filter="grade" data-value="2020级">2020级</div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-group-title">预警状态</div>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="warning" data-value="all">全部</div>
+                    <div class="filter-option" data-filter="warning" data-value="学业预警">学业预警</div>
+                    <div class="filter-option" data-filter="warning" data-value="心理预警">心理预警</div>
+                    <div class="filter-option" data-filter="warning" data-value="就业预警">就业预警</div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-group-title">谈话状态</div>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="talk" data-value="all">全部</div>
+                    <div class="filter-option" data-filter="talk" data-value="待谈话">待谈话</div>
+                    <div class="filter-option" data-filter="talk" data-value="已谈话">已谈话</div>
+                    <div class="filter-option" data-filter="talk" data-value="跟进中">跟进中</div>
+                </div>
+            </div>
+            <div class="filter-actions" style="margin-top: 24px;">
+                <button class="btn btn-primary" style="width: 100%;" onclick="applyFilters()">应用筛选</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟学生数据
+        const students = [
+            {
+                id: '1001',
+                name: '张三',
+                studentId: '20230101',
+                grade: '2023级',
+                major: '计算机科学与技术',
+                avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=张三&backgroundColor=b6e3f4',
+                tags: ['学业预警', '待谈话'],
+                favorite: false
+            },
+            {
+                id: '1002',
+                name: '李四',
+                studentId: '20220102',
+                grade: '2022级',
+                major: '软件工程',
+                avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=李四&backgroundColor=c0aede',
+                tags: ['就业预警'],
+                favorite: true
+            },
+            {
+                id: '1003',
+                name: '王五',
+                studentId: '20210103',
+                grade: '2021级',
+                major: '人工智能',
+                avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=王五&backgroundColor=d1d4f9',
+                tags: ['心理预警', '跟进中'],
+                favorite: false
+            },
+            {
+                id: '1004',
+                name: '赵六',
+                studentId: '20210104',
+                grade: '2021级',
+                major: '数据科学',
+                avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=赵六&backgroundColor=ffd5dc',
+                tags: ['学业预警'],
+                favorite: true
+            },
+            {
+                id: '1005',
+                name: '钱七',
+                studentId: '20220105',
+                grade: '2022级',
+                major: '网络空间安全',
+                avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=钱七&backgroundColor=ffdfbf',
+                tags: ['已谈话'],
+                favorite: false
+            },
+            {
+                id: '1006',
+                name: '孙八',
+                studentId: '20230106',
+                grade: '2023级',
+                major: '信息安全',
+                avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=孙八&backgroundColor=c1e1c5',
+                tags: ['待谈话'],
+                favorite: false
+            }
+        ];
+
+        // 当前显示模式：'all' 或 'favorites'
+        let currentMode = 'all';
+        
+        // 当前筛选条件
+        let currentFilters = {
+            grade: 'all',
+            warning: 'all',
+            talk: 'all'
+        };
+
+        // 渲染学生列表
+        function renderStudentList(data = filterStudents()) {
+            const listElement = document.getElementById('studentList');
+            
+            // 检查是否有数据
+            if (data.length === 0) {
+                // 显示空状态
+                if (currentMode === 'favorites') {
+                    listElement.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">⭐</div>
+                            <div class="empty-text">暂无重点关注学生</div>
+                        </div>
+                    `;
+                } else {
+                    listElement.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div class="empty-text">未找到符合条件的学生</div>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            // 渲染学生列表
+            listElement.innerHTML = data.map(student => `
+                <div class="student-item" onclick="handleStudentClick('${student.id}', event)">
+                    <div class="avatar student-avatar">
+                        <img src="${student.avatar}" alt="${student.name}">
+                    </div>
+                    <div class="student-info">
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-meta">
+                            <span>${student.studentId}</span>
+                            <span class="meta-divider">|</span>
+                            <span>${student.grade}</span>
+                            <span class="meta-divider">|</span>
+                            <span>${student.major}</span>
+                        </div>
+                        <div class="student-tags">
+                            ${student.tags.map(tag => `
+                                <span class="tag ${getTagClass(tag)}">${tag}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="favorite-btn ${student.favorite ? 'active' : ''}" 
+                         onclick="toggleFavorite('${student.id}', event)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="${student.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 L12 2 Z" />
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 根据当前模式和筛选条件过滤学生
+        function filterStudents() {
+            // 首先按照是否收藏筛选
+            let filtered = students.filter(student => {
+                if (currentMode === 'favorites') {
+                    return student.favorite;
+                }
+                return true;
+            });
+            
+            // 应用搜索关键词
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            if (keyword) {
+                filtered = filtered.filter(student => 
+                    student.name.toLowerCase().includes(keyword) ||
+                    student.studentId.toLowerCase().includes(keyword)
+                );
+            }
+            
+            // 应用筛选条件
+            if (currentFilters.grade !== 'all') {
+                filtered = filtered.filter(student => student.grade === currentFilters.grade);
+            }
+            
+            if (currentFilters.warning !== 'all') {
+                filtered = filtered.filter(student => 
+                    student.tags.some(tag => tag === currentFilters.warning)
+                );
+            }
+            
+            if (currentFilters.talk !== 'all') {
+                filtered = filtered.filter(student => 
+                    student.tags.some(tag => tag === currentFilters.talk)
+                );
+            }
+            
+            return filtered;
+        }
+
+        // 获取标签样式类
+        function getTagClass(tag) {
+            if (tag.includes('预警')) return 'tag-warning';
+            return 'tag-info';
+        }
+
+        // 处理学生点击
+        function handleStudentClick(studentId, event) {
+            // 如果点击的是收藏按钮，不跳转
+            if (event.target.closest('.favorite-btn')) {
+                return;
+            }
+            window.parent.postMessage({ type: 'studentDetail', studentId }, '*');
+        }
+
+        // 切换筛选面板
+        function toggleFilter() {
+            const panel = document.getElementById('filterPanel');
+            panel.classList.toggle('active');
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            renderStudentList();
+            toggleFilter(); // 关闭筛选面板
+        }
+
+        // 切换收藏状态
+        function toggleFavorite(studentId, event) {
+            // 阻止冒泡，避免触发学生点击事件
+            event.stopPropagation();
+            
+            // 查找学生并切换收藏状态
+            const student = students.find(s => s.id === studentId);
+            if (student) {
+                student.favorite = !student.favorite;
+                
+                // 更新UI
+                const btn = event.currentTarget;
+                if (student.favorite) {
+                    btn.classList.add('active');
+                    btn.querySelector('svg').setAttribute('fill', 'currentColor');
+                } else {
+                    btn.classList.remove('active');
+                    btn.querySelector('svg').setAttribute('fill', 'none');
+                }
+                
+                // 如果当前是在"重点关注"选项卡中，可能需要重新渲染列表
+                if (currentMode === 'favorites') {
+                    renderStudentList();
+                }
+                
+                // 显示提示
+                const message = student.favorite ? '已添加到重点关注' : '已取消重点关注';
+                showToast(message);
+            }
+        }
+
+        // 显示提示
+        function showToast(message) {
+            // 创建提示元素
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '80px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.padding = '8px 16px';
+            toast.style.background = 'rgba(0, 0, 0, 0.7)';
+            toast.style.color = '#fff';
+            toast.style.borderRadius = '20px';
+            toast.style.fontSize = '14px';
+            toast.style.zIndex = '2000';
+            toast.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 2秒后自动移除
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 2000);
+        }
+
+        // 处理筛选选项点击
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const filterType = e.target.getAttribute('data-filter');
+                const filterValue = e.target.getAttribute('data-value');
+                
+                // 更新当前筛选条件
+                currentFilters[filterType] = filterValue;
+                
+                // 视觉上激活当前选项
+                const parent = e.target.parentElement;
+                parent.querySelectorAll('.filter-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                e.target.classList.add('active');
+            });
+        });
+
+        // 处理选项卡切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                // 获取选项卡类型
+                const tabType = e.target.getAttribute('data-tab');
+                
+                // 更新当前模式
+                currentMode = tabType;
+                
+                // 更新UI激活状态
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                // 重新渲染列表
+                renderStudentList();
+            });
+        });
+
+        // 处理搜索
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', () => {
+            renderStudentList();
+        });
+
+        // 初始化渲染
+        renderStudentList();
+    </script>
+</body>
+</html> 
